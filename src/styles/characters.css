@@ -1,0 +1,77 @@
+.character-sprite {
+  position: absolute;
+  bottom: 18%;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  z-index: 10;
+}
+
+.character-sprite.pos-left {
+  left: 8%;
+}
+
+.character-sprite.pos-center {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.character-sprite.pos-right {
+  right: 8%;
+}
+
+.character-sprite.pos-left.entering,
+.character-sprite.pos-center.entering,
+.character-sprite.pos-right.entering {
+  animation: sprite-enter 0.4s ease forwards;
+}
+
+@keyframes sprite-enter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.character-sprite.pos-center.entering {
+  animation-name: sprite-enter-center;
+}
+
+@keyframes sprite-enter-center {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.sprite-svg {
+  width: clamp(140px, 22vw, 260px);
+  height: clamp(280px, 44vw, 480px);
+  filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3));
+}
+
+.sprite-expression {
+  position: absolute;
+  top: 15%;
+  right: 10%;
+  font-size: 1.2rem;
+  color: var(--color-accent);
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .character-sprite {
+    bottom: 38%;
+  }
+
+  .sprite-svg {
+    width: clamp(100px, 30vw, 180px);
+    height: clamp(200px, 55vw, 340px);
+  }
+}
