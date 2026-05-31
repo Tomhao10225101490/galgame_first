@@ -50,7 +50,7 @@ export const STORY_NODES: StoryNode[] = [
   },
   { id: 'ch1_c2a', type: 'narration', text: '我把门票放进口袋。不知道为什么，指尖有点发凉。', next: 'ch1_end' },
   { id: 'ch1_c2b', type: 'narration', text: '抽屉关上的时候，我听见自己松了口气。有些问题，不问比较轻松。', next: 'ch1_end' },
-  { id: 'ch1_c2c', type: 'dialogue', speaker: 'linmu', text: '白外套？没印象。不过 lately 半夜来的客人，妈也记不清了。', next: 'ch1_end', expression: 'gentle' },
+  { id: 'ch1_c2c', type: 'dialogue', speaker: 'linmu', text: '白外套？没印象。不过最近半夜来的客人，妈也记不清了。', next: 'ch1_end', expression: 'gentle' },
 
   { id: 'ch1_end', type: 'narration', text: '—— 第1章《便利店的午夜客人》结束 ——', next: 'ch2_start' },
 
@@ -221,7 +221,7 @@ export const STORY_NODES: StoryNode[] = [
   { id: 'ch5_c8a', type: 'show', character: 'weiyang', expression: 'gentle', position: 'center', next: 'ch5_c8a_d' },
   { id: 'ch5_c8a_d', type: 'dialogue', speaker: 'weiyang', text: '星象仪修好了大半。观星会定在三天后。', next: 'ch5_merge' },
   { id: 'ch5_c8b', type: 'show', character: 'zhixia', expression: 'neutral', position: 'center', next: 'ch5_c8b_d' },
-  { id: 'ch5_c8b_d', type: 'dialogue', speaker: 'zhixia', text: 'Interview Questions 我整理好了。谢谢你愿意来。', next: 'ch5_merge' },
+  { id: 'ch5_c8b_d', type: 'dialogue', speaker: 'zhixia', text: '面试题我整理好了。谢谢你愿意来。', next: 'ch5_merge' },
   { id: 'ch5_c8c', type: 'show', character: 'baichuan', expression: 'smile', position: 'center', next: 'ch5_c8c_d' },
   { id: 'ch5_c8c_d', type: 'dialogue', speaker: 'baichuan', text: '你等了多久？', next: 'ch5_c8c_d2' },
   { id: 'ch5_c8c_d2', type: 'dialogue', speaker: 'linche', text: '从关店通知贴出来开始。', next: 'ch5_merge' },
@@ -319,9 +319,9 @@ export const STORY_NODES: StoryNode[] = [
   { id: 'route_zhixia_start', type: 'background', bg: 'classroom_sunset', bgm: 'day', next: 'zx_001' },
   { id: 'zx_001', type: 'effect', changes: { route: 'zhixia' }, next: 'zx_002' },
   { id: 'zx_002', type: 'show', character: 'zhixia', expression: 'serious', position: 'center', next: 'zx_003' },
-  { id: 'zx_003', type: 'dialogue', speaker: 'zhixia', text: '你来了。Interview 在明天。', next: 'zx_004' },
+  { id: 'zx_003', type: 'dialogue', speaker: 'zhixia', text: '你来了。面试在明天。', next: 'zx_004' },
   { id: 'zx_004', type: 'dialogue', speaker: 'linche', text: '你看起来……不太对。', next: 'zx_005' },
-  { id: 'zx_005', type: 'dialogue', speaker: 'zhixia', text: '家里 要我留在本地。Interview 是我唯一的机会。', next: 'zx_006', expression: 'sad' },
+  { id: 'zx_005', type: 'dialogue', speaker: 'zhixia', text: '家里要我留在本地。面试是我唯一的机会。', next: 'zx_006', expression: 'sad' },
   { id: 'zx_006', type: 'narration', text: '她第一次在面前崩溃。试卷散落一地，像被风吹乱的羽毛。', next: 'zx_007' },
   { id: 'zx_007', type: 'dialogue', speaker: 'zhixia', text: '我不是不相信奇迹。我只是不敢把人生交给奇迹。', next: 'zx_choice11' },
 

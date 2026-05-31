@@ -5,7 +5,7 @@ import { SaveLoadPanel } from './components/SaveLoadPanel';
 import { SettingsPanel } from './components/SettingsPanel';
 import { EndingGallery } from './components/EndingGallery';
 import type { AppScreen, GameSettings, GameSnapshot, SaveSlot } from './engine/types';
-import { loadContinue, loadSaves, loadSettings, saveSettings } from './utils/storage';
+import { loadContinue, loadSaves, loadSettings, saveSettings, loadUnlockedEndings } from './utils/storage';
 
 export default function App() {
   const [screen, setScreen] = useState<AppScreen>('mainMenu');
@@ -89,7 +89,7 @@ export default function App() {
       )}
 
       {menuOverlay === 'endings' && (
-        <EndingGallery onClose={() => setMenuOverlay('none')} />
+        <EndingGallery key={loadUnlockedEndings().length} onClose={() => setMenuOverlay('none')} />
       )}
     </div>
   );

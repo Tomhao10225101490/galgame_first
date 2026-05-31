@@ -26,7 +26,7 @@ export function TextBox({
   };
 
   return (
-    <div className="text-box" onClick={handleClick} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && handleClick()}>
+    <div className="text-box" onClick={handleClick} role="button" tabIndex={0} onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), handleClick())}>
       {!isNarration && speakerName && (
         <div className="text-box-name">{speakerName}</div>
       )}

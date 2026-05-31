@@ -19,15 +19,38 @@ interface GameScreenProps {
 
 export function GameScreen({ onReturnToTitle, initialSnapshot }: GameScreenProps) {
   const game = useGameEngine(onReturnToTitle);
-  const { state, settings, autoPlay, setAutoPlay, skipMode, setSkipMode, advance, selectChoice, startNewGame, loadGame, updateSettings, persistContinue } = game;
+  const {
+    state,
+    settings,
+    autoPlay,
+    setAutoPlay,
+    skipMode,
+    setSkipMode,
+    advance,
+    selectChoice,
+    startNewGame,
+    loadGame,
+    updateSettings,
+    persistContinue,
+    forceUpdate,
+  } = game;
 
   const [overlay, setOverlay] = useState<'none' | 'save' | 'load' | 'settings' | 'history'>('none');
   const [saveLoadMode, setSaveLoadMode] = useState<'save' | 'load'>('save');
-  const initialized = useRef(false);
+  const initRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && overlay !== 'none') setOverlay('none');
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [overlay]);
+
+  useEffect(() => {
+    const key = initialSnapshot ? JSON.stringify(initialSnapshot.nodeId) : 'new';
+    if (initRef.current === key) return;
+    initRef.current = key;
     if (initialSnapshot) {
       loadGame(initialSnapshot);
     } else {
@@ -36,17 +59,30 @@ export function GameScreen({ onReturnToTitle, initialSnapshot }: GameScreenProps
   }, [initialSnapshot, loadGame, startNewGame]);
 
   const line = state.currentLine;
-  const { displayed, done, skip } = useTypewriter(
-    line?.text ?? '',
-    settings.textSpeed,
-    true,
-  );
+  const { displayed, done, skip } = useTypewriter(line?.text ?? '', settings.textSpeed, true);
+
+  const overlayOpen = overlay !== 'none';
+
+  useEffect(() => {
+    if (!autoPlay || !done || overlayOpen || state.choices || !state.isWaitingForInput) return;
+    const timer = window.setTimeout(() => advance(), settings.autoDelay);
+    return () => clearTimeout(timer);
+  }, [autoPlay, done, overlayOpen, state.choices, state.isWaitingForInput, state.currentLine, advance, settings.autoDelay]);
 
   const handleAdvance = useCallback(() => {
+    audioEngine.ensureStarted();
     audioEngine.playSe('click');
     if (done) advance();
     else skip();
   }, [done, advance, skip]);
+
+  const handleChoice = useCallback(
+    (index: number) => {
+      audioEngine.ensureStarted();
+      selectChoice(index);
+    },
+    [selectChoice],
+  );
 
   const slots: SaveSlot[] = loadSaves();
 
@@ -62,12 +98,14 @@ export function GameScreen({ onReturnToTitle, initialSnapshot }: GameScreenProps
     const entry = slots.find((s) => s.slot === slot);
     if (entry && entry.timestamp > 0) {
       loadGame(entry.snapshot);
+      initRef.current = JSON.stringify(entry.snapshot.nodeId);
+      forceUpdate();
       setOverlay('none');
     }
   };
 
   return (
-    <div className="game-screen">
+    <div className="game-screen" onClick={() => audioEngine.ensureStarted()}>
       <Background bgId={state.background} />
 
       {settings.showSprites &&
@@ -86,8 +124,14 @@ export function GameScreen({ onReturnToTitle, initialSnapshot }: GameScreenProps
         skipMode={skipMode}
         onToggleAuto={() => setAutoPlay(!autoPlay)}
         onToggleSkip={() => setSkipMode(!skipMode)}
-        onSave={() => { setSaveLoadMode('save'); setOverlay('save'); }}
-        onLoad={() => { setSaveLoadMode('load'); setOverlay('load'); }}
+        onSave={() => {
+          setSaveLoadMode('save');
+          setOverlay('save');
+        }}
+        onLoad={() => {
+          setSaveLoadMode('load');
+          setOverlay('load');
+        }}
         onHistory={() => setOverlay('history')}
         onSettings={() => setOverlay('settings')}
         onTitle={() => {
@@ -96,9 +140,7 @@ export function GameScreen({ onReturnToTitle, initialSnapshot }: GameScreenProps
         }}
       />
 
-      {state.choices && (
-        <ChoicePanel choices={state.choices} onSelect={selectChoice} />
-      )}
+      {state.choices && <ChoicePanel choices={state.choices} onSelect={handleChoice} />}
 
       {line && !state.choices && (
         <TextBox
@@ -111,9 +153,7 @@ export function GameScreen({ onReturnToTitle, initialSnapshot }: GameScreenProps
         />
       )}
 
-      {state.isEnding && state.endingTitle && (
-        <div className="ending-banner">{state.endingTitle}</div>
-      )}
+      {state.isEnding && state.endingTitle && <div className="ending-banner">{state.endingTitle}</div>}
 
       {(overlay === 'save' || overlay === 'load') && (
         <SaveLoadPanel
@@ -133,9 +173,7 @@ export function GameScreen({ onReturnToTitle, initialSnapshot }: GameScreenProps
         />
       )}
 
-      {overlay === 'history' && (
-        <HistoryPanel history={state.history} onClose={() => setOverlay('none')} />
-      )}
+      {overlay === 'history' && <HistoryPanel history={state.history} onClose={() => setOverlay('none')} />}
     </div>
   );
 }

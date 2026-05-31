@@ -265,14 +265,23 @@ export class VisualNovelEngine {
         break;
       }
 
-      case 'choice':
+      case 'choice': {
         this.state.currentLine = null;
-        this.state.choices = node.choices
+        const available = node.choices
           .map((c, index) => ({ ...c, index }))
-          .filter((c) => !c.condition || checkCondition(this.state.variables, c.condition, this.unlockedEndings))
-          .map((c) => ({ text: c.text, index: c.index }));
+          .filter((c) => !c.condition || checkCondition(this.state.variables, c.condition, this.unlockedEndings));
+        if (available.length === 0) {
+          const fallback = node.choices[0];
+          if (fallback?.next) {
+            this.state.nodeId = fallback.next;
+            this.processUntilInteractive(false);
+          }
+          break;
+        }
+        this.state.choices = available.map((c) => ({ text: c.text, index: c.index }));
         this.state.isWaitingForInput = true;
         break;
+      }
 
       case 'ending':
         this.state.isEnding = true;
@@ -286,6 +295,9 @@ export class VisualNovelEngine {
           text: node.texts[0] ?? '',
           isNarration: true,
         };
+        if (node.texts[0]) {
+          this.addHistory(node.id, null, node.texts[0]);
+        }
         this.state.isWaitingForInput = true;
         this.onEnding?.(node.endingId);
         break;
@@ -304,8 +316,11 @@ export class VisualNovelEngine {
         break;
 
       case 'dialogue': {
-        if (node.expression) {
-          this.updateVisibleCharacter(node.speaker!, node.expression);
+        if (node.expression && node.speaker) {
+          const visible = this.state.visibleCharacters.some((ch) => ch.id === node.speaker);
+          if (visible) {
+            this.updateVisibleCharacter(node.speaker, node.expression);
+          }
         }
         this.state.currentLine = {
           nodeId: node.id,

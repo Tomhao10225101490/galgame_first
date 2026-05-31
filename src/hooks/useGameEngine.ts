@@ -62,69 +62,55 @@ export function useGameEngine(onReturnToTitle: () => void) {
 
   const [autoPlay, setAutoPlay] = useState(false);
   const [skipMode, setSkipMode] = useState(false);
-  const autoTimerRef = useRef<number | null>(null);
-
-  const state = engine.state;
-
-  useEffect(() => {
-    audioEngine.setVolume(settings.volume);
-    audioEngine.setMuted(settings.muted);
-  }, [settings.volume, settings.muted]);
-
-  useEffect(() => {
-    if (state.bgm && state.bgm !== 'none') {
-      audioEngine.playBgm(state.bgm as BgmId);
-    }
-  }, [state.bgm]);
 
   const persistContinue = useCallback(() => {
-    const snap = engine.getSnapshot();
-    const preview = state.currentLine?.text.slice(0, 30) ?? '';
+    const snap = engineRef.current.getSnapshot();
+    const preview = engineRef.current.state.currentLine?.text.slice(0, 30) ?? '';
     saveContinue(snap, preview);
-  }, [engine, state.currentLine]);
+  }, []);
 
   const advance = useCallback(() => {
-    if (state.isEnding && state.endingTexts) {
-      const currentIdx = state.endingTexts.indexOf(state.currentLine?.text ?? '');
-      if (currentIdx >= state.endingTexts.length - 1) {
+    const s = engineRef.current.state;
+    if (s.isEnding && s.endingTexts.length > 0) {
+      const currentIdx = s.endingTexts.indexOf(s.currentLine?.text ?? '');
+      if (currentIdx >= s.endingTexts.length - 1) {
         onReturnToTitle();
         return;
       }
     }
-    const ok = engine.advance();
+
+    const ok = engineRef.current.advance();
     if (ok) {
-      engine.markCurrentRead();
       persistContinue();
       forceUpdate();
-    } else if (state.isEnding) {
+    } else if (engineRef.current.state.isEnding) {
       onReturnToTitle();
     }
-  }, [engine, state, onReturnToTitle, persistContinue, forceUpdate]);
+  }, [onReturnToTitle, persistContinue, forceUpdate]);
 
   const selectChoice = useCallback(
     (index: number) => {
       audioEngine.playSe('choice');
-      engine.selectChoice(index);
+      engineRef.current.selectChoice(index);
       persistContinue();
       forceUpdate();
     },
-    [engine, persistContinue, forceUpdate],
+    [persistContinue, forceUpdate],
   );
 
   const startNewGame = useCallback(() => {
-    engine.reset();
-    engine.processUntilInteractive(false);
+    engineRef.current.reset();
     persistContinue();
     forceUpdate();
-  }, [engine, persistContinue, forceUpdate]);
+  }, [persistContinue, forceUpdate]);
 
   const loadGame = useCallback(
     (snapshot: GameSnapshot) => {
-      engine.loadSnapshot(snapshot);
-      engine.setUnlockedEndings(loadUnlockedEndings());
+      engineRef.current.loadSnapshot(snapshot);
+      engineRef.current.setUnlockedEndings(loadUnlockedEndings());
       forceUpdate();
     },
-    [engine, forceUpdate],
+    [forceUpdate],
   );
 
   const updateSettings = useCallback((partial: Partial<GameSettings>) => {
@@ -135,33 +121,44 @@ export function useGameEngine(onReturnToTitle: () => void) {
     });
   }, []);
 
-  useEffect(() => {
-    if (!autoPlay || !state.isWaitingForInput || state.choices) return;
-    if (autoTimerRef.current) clearTimeout(autoTimerRef.current);
-    autoTimerRef.current = window.setTimeout(() => {
-      advance();
-    }, settings.autoDelay);
-    return () => {
-      if (autoTimerRef.current) clearTimeout(autoTimerRef.current);
-    };
-  }, [autoPlay, state.isWaitingForInput, state.choices, state.currentLine, advance, settings.autoDelay]);
+  const refreshSettings = useCallback(() => {
+    setSettingsState(loadSettings());
+  }, []);
 
   useEffect(() => {
-    if (!skipMode || state.choices || state.isEnding) return;
+    audioEngine.setVolume(settings.volume);
+    audioEngine.setMuted(settings.muted);
+  }, [settings.volume, settings.muted]);
+
+  const bgm = engine.state.bgm;
+
+  useEffect(() => {
+    if (!bgm || bgm === 'none') {
+      audioEngine.stopBgm();
+    } else {
+      audioEngine.playBgm(bgm as BgmId);
+    }
+  }, [bgm]);
+
+  useEffect(() => {
+    if (!skipMode) return;
+
     const id = window.setInterval(() => {
-      const line = engine.state.currentLine;
-      if (line && engine.canSkip(line.nodeId)) {
+      const s = engineRef.current.state;
+      if (s.choices || s.isEnding) return;
+      const line = s.currentLine;
+      if (line && engineRef.current.canSkip(line.nodeId)) {
         advance();
       } else {
         setSkipMode(false);
       }
     }, 80);
     return () => clearInterval(id);
-  }, [skipMode, state.choices, state.isEnding, engine, advance]);
+  }, [skipMode, advance]);
 
   return {
     engine,
-    state,
+    state: engine.state,
     settings,
     autoPlay,
     setAutoPlay,
@@ -172,7 +169,9 @@ export function useGameEngine(onReturnToTitle: () => void) {
     startNewGame,
     loadGame,
     updateSettings,
+    refreshSettings,
     persistContinue,
+    forceUpdate,
     hasContinue: () => loadContinue() !== null,
     loadContinueSnapshot: () => loadContinue()?.snapshot ?? null,
   };

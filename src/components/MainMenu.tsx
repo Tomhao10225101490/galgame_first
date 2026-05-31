@@ -1,3 +1,5 @@
+import { audioEngine } from '../audio/audioEngine';
+
 interface MainMenuProps {
   hasContinue: boolean;
   onStart: () => void;
@@ -24,11 +26,11 @@ export function MainMenu({
         <h1 className="game-title">星轨便利店</h1>
         <p className="game-subtitle">在一座夏天即将被拆除的旧天文馆旁</p>
         <nav className="main-menu-nav">
-          <button className="menu-btn" onClick={onStart}>开始游戏</button>
+          <button className="menu-btn" onClick={() => { audioEngine.ensureStarted(); onStart(); }}>开始游戏</button>
           {hasContinue && (
-            <button className="menu-btn" onClick={onContinue}>继续游戏</button>
+            <button className="menu-btn" onClick={() => { audioEngine.ensureStarted(); onContinue(); }}>继续游戏</button>
           )}
-          <button className="menu-btn" onClick={onLoad}>读取存档</button>
+          <button className="menu-btn" onClick={() => { audioEngine.ensureStarted(); onLoad(); }}>读取存档</button>
           <button className="menu-btn" onClick={onEndings}>结局收集</button>
           <button className="menu-btn menu-btn-dim" onClick={onSettings}>设置</button>
         </nav>

@@ -12,6 +12,10 @@ class AudioEngine {
   private volume = 0.5;
   private muted = false;
 
+  ensureStarted(): void {
+    this.ensureContext();
+  }
+
   private ensureContext(): AudioContext {
     if (!this.ctx) {
       this.ctx = new AudioContext();
@@ -102,7 +106,11 @@ class AudioEngine {
   }
 
   playBgm(id: BgmId): void {
-    if (id === 'none' || id === this.currentBgm) return;
+    if (id === 'none') {
+      this.stopBgm();
+      return;
+    }
+    if (id === this.currentBgm) return;
     this.stopBgm();
     this.currentBgm = id;
     const ctx = this.ensureContext();
