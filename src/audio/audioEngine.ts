@@ -22,13 +22,16 @@ class AudioEngine {
     this.volume = v;
     Howler.volume(this.muted ? 0 : v);
     if (this.bgmHowl) {
-      this.bgmHowl.volume(v);
+      this.bgmHowl.volume(this.muted ? 0 : v);
     }
   }
 
   setMuted(m: boolean): void {
     this.muted = m;
     Howler.mute(m);
+    if (this.bgmHowl) {
+      this.bgmHowl.volume(m ? 0 : this.volume);
+    }
   }
 
   private getSe(id: SeId): Howl {
@@ -71,23 +74,33 @@ class AudioEngine {
     const src = BGM_ASSETS[id];
     const prev = this.bgmHowl;
     this.currentBgm = id;
+    const targetVol = this.muted ? 0 : this.volume;
 
     const next = new Howl({
       src: [src],
       loop: true,
       volume: 0,
       html5: true,
+      preload: true,
       onloaderror: () => {
         if (this.currentBgm === id) this.currentBgm = null;
       },
+      onplayerror: () => {
+        next.once('unlock', () => next.play());
+      },
     });
 
-    next.once('play', () => {
-      next.fade(0, this.muted ? 0 : this.volume, 1500);
-    });
+    const fadeIn = () => {
+      if (this.currentBgm !== id || this.bgmHowl !== next) return;
+      if (next.volume() < targetVol * 0.05) {
+        next.fade(0, targetVol, 1500);
+      }
+    };
 
+    next.once('play', fadeIn);
     this.bgmHowl = next;
     next.play();
+    window.setTimeout(fadeIn, 400);
 
     if (prev) {
       prev.fade(prev.volume(), 0, 1500);
