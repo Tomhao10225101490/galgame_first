@@ -10,7 +10,8 @@
     "validate": "node scripts/validate-story.mjs && node scripts/smoke-test.mjs",
     "generate-assets": "node scripts/generate-assets.mjs",
     "generate-audio": "bash scripts/generate-audio.sh",
-    "generate-all": "npm run generate-assets && npm run generate-audio"
+    "generate-all": "npm run generate-assets && npm run generate-audio",
+    "cutout-sprites": "python3 scripts/remove-sprite-bg.py"
   },
   "dependencies": {
     "howler": "^2.2.4",

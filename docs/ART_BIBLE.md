@@ -36,3 +36,13 @@ npm run generate-all
 ```
 
 AI 立绘替换：将 PNG 放入对应 `public/assets/sprites/{角色}/neutral.webp`（或运行项目内转换脚本）。
+
+
+## 立绘抠图
+
+```bash
+pip install rembg pillow onnxruntime
+npm run cutout-sprites
+```
+
+使用 rembg 自动抠出人像透明底，避免方形底图叠在画面上。

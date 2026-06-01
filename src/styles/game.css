@@ -482,12 +482,17 @@
 
 /* Sprites */
 .sprite-img {
-  width: clamp(140px, 22vw, 280px);
-  height: clamp(280px, 44vw, 520px);
+  width: clamp(160px, 24vw, 300px);
+  height: clamp(300px, 48vw, 560px);
+  max-height: 72vh;
   object-fit: contain;
   object-position: bottom center;
-  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.35));
+  background: transparent;
+  border: none;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45))
+    drop-shadow(0 12px 32px rgba(0, 0, 0, 0.25));
   transition: opacity 0.35s ease;
+  -webkit-mask-image: none;
 }
 
 .sprite-fallback-wrap {
