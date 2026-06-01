@@ -59,3 +59,22 @@ export async function preloadUrls(
     }),
   );
 }
+
+
+const CHAPTER_BACKGROUNDS: Record<number, string[]> = {
+  1: ['/assets/backgrounds/convenience_night.webp'],
+  2: ['/assets/backgrounds/classroom_sunset.webp', '/assets/backgrounds/school_hallway.webp'],
+  3: ['/assets/backgrounds/rain_street.webp', '/assets/backgrounds/planetarium_old.webp'],
+  4: ['/assets/backgrounds/school_hallway.webp'],
+  5: ['/assets/backgrounds/convenience_day.webp'],
+  6: ['/assets/backgrounds/rooftop_stars.webp', '/assets/backgrounds/planetarium_old.webp'],
+};
+
+export function getChapterPreloadUrls(chapter: number): string[] {
+  return CHAPTER_BACKGROUNDS[chapter] ?? [];
+}
+
+export function preloadChapter(chapter: number): void {
+  const urls = getChapterPreloadUrls(chapter);
+  void Promise.all(urls.map((u) => loadImage(u).catch(() => undefined)));
+}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { CHARACTERS } from '../data/characters';
-import { getSpriteUrl } from '../data/assets';
+import { getSpriteUrlWithFallback } from '../data/assets';
 import type { CharacterId, ExpressionId } from '../engine/types';
 import { SpriteFallback } from './SpriteFallback';
 
@@ -13,15 +13,16 @@ interface CharacterSpriteProps {
 
 export function CharacterSprite({ characterId, expression, position, visible }: CharacterSpriteProps) {
   const [imgOk, setImgOk] = useState(true);
+  const [useNeutralFallback, setUseNeutralFallback] = useState(false);
   const [displayedExpr, setDisplayedExpr] = useState(expression);
   const [opacity, setOpacity] = useState(1);
-  const url = getSpriteUrl(characterId, expression);
 
   useEffect(() => {
     if (expression === displayedExpr) return;
     setOpacity(0);
     const t = window.setTimeout(() => {
       setDisplayedExpr(expression);
+      setUseNeutralFallback(false);
       setImgOk(true);
       requestAnimationFrame(() => setOpacity(1));
     }, 180);
@@ -29,13 +30,22 @@ export function CharacterSprite({ characterId, expression, position, visible }: 
   }, [expression, displayedExpr]);
 
   useEffect(() => {
+    setUseNeutralFallback(false);
     setImgOk(true);
-  }, [url]);
+  }, [characterId, displayedExpr]);
 
   if (!visible) return null;
 
   const char = CHARACTERS[characterId];
-  const displayUrl = getSpriteUrl(characterId, displayedExpr);
+  const displayUrl = getSpriteUrlWithFallback(characterId, displayedExpr, useNeutralFallback);
+
+  const handleImgError = () => {
+    if (!useNeutralFallback && displayedExpr !== 'neutral') {
+      setUseNeutralFallback(true);
+      return;
+    }
+    setImgOk(false);
+  };
 
   return (
     <div className={`character-sprite pos-${position} entering`}>
@@ -45,7 +55,7 @@ export function CharacterSprite({ characterId, expression, position, visible }: 
           alt={char.name}
           className="sprite-img"
           style={{ opacity }}
-          onError={() => setImgOk(false)}
+          onError={handleImgError}
           draggable={false}
         />
       ) : (

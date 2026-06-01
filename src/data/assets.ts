@@ -48,7 +48,19 @@ export function getSpritePath(character: CharacterId, expression: ExpressionId):
   return `${ASSET_BASE}/sprites/${character}/${expression}.webp`;
 }
 
+/** 立绘 URL；加载失败时由组件回退到 neutral */
 export function getSpriteUrl(character: CharacterId, expression: ExpressionId): string {
+  return getSpritePath(character, expression);
+}
+
+export function getSpriteUrlWithFallback(
+  character: CharacterId,
+  expression: ExpressionId,
+  useNeutralFallback: boolean,
+): string {
+  if (useNeutralFallback && expression !== 'neutral') {
+    return getSpritePath(character, 'neutral');
+  }
   return getSpritePath(character, expression);
 }
 

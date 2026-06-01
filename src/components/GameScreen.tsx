@@ -10,6 +10,7 @@ import { HistoryPanel } from './HistoryPanel';
 import { useGameEngine } from '../hooks/useGameEngine';
 import { useTypewriter } from '../hooks/useTypewriter';
 import { loadSaves, saveToSlot } from '../utils/storage';
+import { preloadChapter } from '../utils/assetPreloader';
 import { audioEngine } from '../audio/audioEngine';
 import type { GameSnapshot, SaveSlot } from '../engine/types';
 
@@ -58,6 +59,11 @@ export function GameScreen({ onReturnToTitle, initialSnapshot }: GameScreenProps
       startNewGame();
     }
   }, [initialSnapshot, loadGame, startNewGame]);
+
+  useEffect(() => {
+    const ch = game.engine.state.variables.chapter;
+    if (ch >= 1) preloadChapter(ch);
+  }, [game.engine.state.variables.chapter]);
 
   const line = state.currentLine;
   const { displayed, done, skip } = useTypewriter(line?.text ?? '', settings.textSpeed, true);
