@@ -10,6 +10,7 @@ import { HistoryPanel } from './HistoryPanel';
 import { useGameEngine } from '../hooks/useGameEngine';
 import { useTypewriter } from '../hooks/useTypewriter';
 import { loadSaves, saveToSlot } from '../utils/storage';
+import { preloadChapter } from '../utils/assetPreloader';
 import { audioEngine } from '../audio/audioEngine';
 import type { GameSnapshot, SaveSlot } from '../engine/types';
 
@@ -59,10 +60,19 @@ export function GameScreen({ onReturnToTitle, initialSnapshot }: GameScreenProps
     }
   }, [initialSnapshot, loadGame, startNewGame]);
 
+  useEffect(() => {
+    const chapter = game.engine.state.variables.chapter;
+    if (chapter >= 1) void preloadChapter(chapter);
+  }, [game.engine.state.variables.chapter]);
+
   const line = state.currentLine;
   const { displayed, done, skip } = useTypewriter(line?.text ?? '', settings.textSpeed, true);
 
   const overlayOpen = overlay !== 'none';
+
+  useEffect(() => {
+    audioEngine.playAmbience(state.background);
+  }, [state.background]);
 
   useEffect(() => {
     if (!autoPlay || !done || overlayOpen || state.choices || !state.isWaitingForInput) return;
@@ -72,9 +82,13 @@ export function GameScreen({ onReturnToTitle, initialSnapshot }: GameScreenProps
 
   const handleAdvance = useCallback(() => {
     audioEngine.ensureStarted();
-    audioEngine.playSe('click');
-    if (done) advance();
-    else skip();
+    if (done) {
+      audioEngine.playSe('pageTurn');
+      advance();
+    } else {
+      audioEngine.playSe('click');
+      skip();
+    }
   }, [done, advance, skip]);
 
   const handleChoice = useCallback(
@@ -106,7 +120,7 @@ export function GameScreen({ onReturnToTitle, initialSnapshot }: GameScreenProps
   };
 
   return (
-    <div className="game-screen" onClick={() => audioEngine.ensureStarted()}>
+    <div className={`game-screen scene-${state.background} bgm-${state.bgm}`} onClick={() => audioEngine.ensureStarted()}>
       <Background bgId={state.background} />
 
       {settings.showSprites &&

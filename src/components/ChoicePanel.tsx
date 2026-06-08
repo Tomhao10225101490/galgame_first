@@ -12,6 +12,7 @@ export function ChoicePanel({ choices, onSelect }: ChoicePanelProps) {
           className="choice-btn"
           onClick={() => onSelect(choice.index)}
         >
+          <span className="choice-index">{String(choice.index + 1).padStart(2, '0')}</span>
           {choice.text}
         </button>
       ))}
