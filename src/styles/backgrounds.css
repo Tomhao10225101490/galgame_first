@@ -25,7 +25,31 @@
   transform-origin: center;
 }
 
+.bg-image {
+  position: absolute;
+  inset: -2%;
+  width: 104%;
+  height: 104%;
+  object-fit: cover;
+  object-position: center;
+  user-select: none;
+  pointer-events: none;
+}
+
+.bg-readable-gradient {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.18) 0%, transparent 20%, transparent 56%, rgba(2, 4, 12, 0.58) 100%),
+    linear-gradient(90deg, rgba(0,0,0,0.22), transparent 24%, transparent 76%, rgba(0,0,0,0.18));
+}
+
 .depth-wide .bg-camera {
+  animation: slow-pan-wide 24s ease-in-out infinite alternate;
+}
+
+.depth-wide .bg-image {
   animation: slow-pan-wide 24s ease-in-out infinite alternate;
 }
 
@@ -33,7 +57,15 @@
   animation: slow-pan-dramatic 18s ease-in-out infinite alternate;
 }
 
+.depth-dramatic .bg-image {
+  animation: slow-pan-dramatic 18s ease-in-out infinite alternate;
+}
+
 .depth-quiet .bg-camera {
+  animation: slow-pan-quiet 28s ease-in-out infinite alternate;
+}
+
+.depth-quiet .bg-image {
   animation: slow-pan-quiet 28s ease-in-out infinite alternate;
 }
 

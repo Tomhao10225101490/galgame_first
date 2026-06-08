@@ -4,9 +4,13 @@ import { GameScreen } from './components/GameScreen';
 import { SaveLoadPanel } from './components/SaveLoadPanel';
 import { SettingsPanel } from './components/SettingsPanel';
 import { EndingGallery } from './components/EndingGallery';
+import { CreditsPanel } from './components/CreditsPanel';
+import { LoadingScreen } from './components/LoadingScreen';
 import type { AppScreen, GameSettings, GameSnapshot, SaveSlot } from './engine/types';
 import { loadContinue, loadSaves, loadSettings, saveSettings, loadUnlockedEndings } from './utils/storage';
 import { audioEngine } from './audio/audioEngine';
+import { CRITICAL_PRELOAD_URLS, getAllBgmUrls } from './data/assets';
+import { preloadUrls } from './utils/assetPreloader';
 
 export default function App() {
   const [screen, setScreen] = useState<AppScreen>('mainMenu');
@@ -14,7 +18,9 @@ export default function App() {
   const [hasContinue, setHasContinue] = useState(() => loadContinue() !== null);
   const [gameKey, setGameKey] = useState(0);
   const [initialSnapshot, setInitialSnapshot] = useState<GameSnapshot | null>(null);
-  const [menuOverlay, setMenuOverlay] = useState<'none' | 'load' | 'settings' | 'endings'>('none');
+  const [menuOverlay, setMenuOverlay] = useState<'none' | 'load' | 'settings' | 'endings' | 'credits'>('none');
+  const [bootLoading, setBootLoading] = useState(true);
+  const [loadPercent, setLoadPercent] = useState(0);
 
   const updateSettings = (partial: Partial<GameSettings>) => {
     setSettings((prev) => {
@@ -23,6 +29,12 @@ export default function App() {
       return next;
     });
   };
+
+  useEffect(() => {
+    preloadUrls([...CRITICAL_PRELOAD_URLS, ...getAllBgmUrls()], (progress) => setLoadPercent(progress.percent)).finally(
+      () => setBootLoading(false),
+    );
+  }, []);
 
   useEffect(() => {
     audioEngine.setVolume(settings.volume);
@@ -53,6 +65,10 @@ export default function App() {
 
   const slots: SaveSlot[] = loadSaves();
 
+  if (bootLoading) {
+    return <LoadingScreen percent={loadPercent} />;
+  }
+
   return (
     <div className="app">
       {screen === 'mainMenu' && (
@@ -74,6 +90,7 @@ export default function App() {
           onLoad={() => setMenuOverlay('load')}
           onEndings={() => setMenuOverlay('endings')}
           onSettings={() => setMenuOverlay('settings')}
+          onCredits={() => setMenuOverlay('credits')}
         />
       )}
 
@@ -108,6 +125,8 @@ export default function App() {
       {menuOverlay === 'endings' && (
         <EndingGallery key={loadUnlockedEndings().length} onClose={() => setMenuOverlay('none')} />
       )}
+
+      {menuOverlay === 'credits' && <CreditsPanel onClose={() => setMenuOverlay('none')} />}
     </div>
   );
 }

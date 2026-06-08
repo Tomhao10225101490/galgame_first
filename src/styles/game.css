@@ -18,6 +18,20 @@
     linear-gradient(180deg, #030712 0%, #111939 48%, #2b2856 100%);
 }
 
+.main-menu-keyvisual {
+  background-size: cover;
+  background-position: center;
+}
+
+.main-menu-keyvisual::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, rgba(4, 7, 16, 0.05), rgba(2, 3, 9, 0.58)),
+    linear-gradient(90deg, rgba(0,0,0,0.42), transparent 32%, rgba(0,0,0,0.26));
+}
+
 .menu-stars {
   position: absolute;
   inset: 0;
@@ -69,6 +83,75 @@
     linear-gradient(180deg, rgba(20, 28, 52, 0.3), rgba(4, 5, 10, 0.96));
   clip-path: polygon(8% 42%, 26% 28%, 72% 28%, 92% 42%, 92% 100%, 8% 100%);
   box-shadow: 0 -20px 90px rgba(93, 164, 255, 0.18);
+}
+
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(114, 164, 255, 0.2), transparent 28%),
+    linear-gradient(180deg, #020510, #111836 56%, #241f43);
+}
+
+.loading-orbit {
+  position: absolute;
+  width: min(76vw, 720px);
+  height: min(34vw, 340px);
+  border: 1px solid rgba(240, 200, 120, 0.3);
+  border-radius: 50%;
+  transform: rotate(-14deg);
+  animation: orbit-drift 5s ease-in-out infinite alternate;
+}
+
+.loading-card {
+  position: relative;
+  width: min(88vw, 520px);
+  padding: 32px;
+  border-radius: 24px;
+  border: 1px solid rgba(240, 200, 120, 0.24);
+  background: rgba(8, 11, 25, 0.62);
+  backdrop-filter: blur(18px);
+  text-align: center;
+  box-shadow: 0 28px 90px rgba(0,0,0,0.42);
+}
+
+.loading-kicker {
+  color: rgba(240, 200, 120, 0.72);
+  letter-spacing: 0.28em;
+  font-size: 0.72rem;
+  margin-bottom: 10px;
+}
+
+.loading-card h1 {
+  color: var(--color-accent);
+  letter-spacing: 0.25em;
+  margin-bottom: 22px;
+}
+
+.loading-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.1);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.loading-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #8fc8ff, var(--color-accent));
+  box-shadow: 0 0 20px rgba(240, 200, 120, 0.45);
+  transition: width 0.25s ease;
+}
+
+.loading-card p {
+  color: rgba(232, 230, 227, 0.62);
+  font-size: 0.8rem;
 }
 
 .main-menu-shade {
@@ -497,6 +580,25 @@
   width: 100%;
 }
 
+.credits-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 620px;
+}
+
+.credits-body h3 {
+  color: var(--color-accent);
+  margin-bottom: 6px;
+  letter-spacing: 0.12em;
+}
+
+.credits-body p {
+  color: var(--color-text-dim);
+  line-height: 1.7;
+  font-size: 0.92rem;
+}
+
 /* History */
 .history-list {
   max-height: 50vh;
@@ -590,6 +692,15 @@
   .choice-panel {
     bottom: 42vh;
     width: 90vw;
+  }
+
+  .main-menu-content {
+    width: 92vw;
+    padding: 24px 18px;
+  }
+
+  .game-title {
+    letter-spacing: 0.16em;
   }
 
   .save-slots {

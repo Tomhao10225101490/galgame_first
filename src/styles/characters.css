@@ -51,9 +51,16 @@
   }
 }
 
-.sprite-svg {
-  width: clamp(160px, 24vw, 292px);
-  height: clamp(320px, 48vw, 540px);
+.sprite-img,
+.sprite-fallback {
+  width: clamp(190px, 27vw, 340px);
+  height: clamp(380px, 56vw, 640px);
+}
+
+.sprite-img {
+  display: block;
+  object-fit: contain;
+  object-position: bottom center;
   filter:
     drop-shadow(0 18px 32px rgba(0, 0, 0, 0.42))
     drop-shadow(0 0 18px rgba(240, 200, 120, 0.08));
@@ -116,6 +123,12 @@
     drop-shadow(0 0 22px rgba(120, 180, 255, 0.12));
 }
 
+.expression-serious .sprite-img {
+  filter:
+    drop-shadow(0 18px 32px rgba(0, 0, 0, 0.48))
+    drop-shadow(0 0 22px rgba(120, 180, 255, 0.12));
+}
+
 .expression-gentle .sprite-aura,
 .expression-smile .sprite-aura {
   opacity: 1;
@@ -127,12 +140,54 @@
   to { transform: translateY(-6px); }
 }
 
+.sprite-fallback {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-direction: column;
+  padding-bottom: 48px;
+  filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.42));
+  animation: sprite-breathe 5.5s ease-in-out infinite alternate;
+}
+
+.fallback-head {
+  width: 120px;
+  height: 140px;
+  border-radius: 50% 50% 46% 46%;
+  background: linear-gradient(180deg, var(--sprite-color), var(--sprite-accent));
+  display: grid;
+  place-items: center;
+  box-shadow: inset 0 12px 28px rgba(255,255,255,0.12);
+}
+
+.fallback-face {
+  color: rgba(255,255,255,0.75);
+  font-size: 2rem;
+}
+
+.fallback-body {
+  width: 190px;
+  height: 260px;
+  margin-top: -8px;
+  border-radius: 42% 42% 12% 12%;
+  background: linear-gradient(160deg, var(--sprite-accent), var(--sprite-color));
+}
+
+.fallback-name {
+  margin-top: 12px;
+  color: rgba(232, 230, 227, 0.7);
+  letter-spacing: 0.14em;
+  font-size: 0.8rem;
+}
+
 @media (max-width: 768px) {
   .character-sprite {
     bottom: 38%;
   }
 
-  .sprite-svg {
+  .sprite-img,
+  .sprite-fallback {
     width: clamp(100px, 30vw, 180px);
     height: clamp(200px, 55vw, 340px);
   }
