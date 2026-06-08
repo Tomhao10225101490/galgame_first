@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MainMenu } from './components/MainMenu';
 import { GameScreen } from './components/GameScreen';
 import { SaveLoadPanel } from './components/SaveLoadPanel';
@@ -6,6 +6,7 @@ import { SettingsPanel } from './components/SettingsPanel';
 import { EndingGallery } from './components/EndingGallery';
 import type { AppScreen, GameSettings, GameSnapshot, SaveSlot } from './engine/types';
 import { loadContinue, loadSaves, loadSettings, saveSettings, loadUnlockedEndings } from './utils/storage';
+import { audioEngine } from './audio/audioEngine';
 
 export default function App() {
   const [screen, setScreen] = useState<AppScreen>('mainMenu');
@@ -22,6 +23,22 @@ export default function App() {
       return next;
     });
   };
+
+  useEffect(() => {
+    audioEngine.setVolume(settings.volume);
+    audioEngine.setMuted(settings.muted);
+  }, [settings.volume, settings.muted]);
+
+  useEffect(() => {
+    if (screen !== 'mainMenu') return;
+    const startTitleAudio = () => {
+      audioEngine.ensureStarted();
+      audioEngine.playBgm('night');
+      audioEngine.playAmbience('title_sky');
+    };
+    window.addEventListener('pointerdown', startTitleAudio, { once: true });
+    return () => window.removeEventListener('pointerdown', startTitleAudio);
+  }, [screen]);
 
   const handleLoadFromMenu = (slot: number) => {
     const saves = loadSaves();

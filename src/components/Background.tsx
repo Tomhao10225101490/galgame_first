@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { BackgroundId } from '../engine/types';
+import { SCENE_PROFILES, type SceneVfx } from '../data/sceneProfiles';
 
 interface BackgroundProps {
   bgId: BackgroundId;
@@ -53,15 +54,20 @@ function StarCanvas() {
 }
 
 function StaticStars() {
-  const stars = Array.from({ length: 30 }, (_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    top: `${Math.random() * 60}%`,
-  }));
+  const stars = useMemo(
+    () =>
+      Array.from({ length: 46 }, (_, i) => ({
+        id: i,
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 64}%`,
+        delay: `${Math.random() * 4}s`,
+      })),
+    [],
+  );
   return (
     <>
       {stars.map((s) => (
-        <div key={s.id} className="star-dot" style={{ left: s.left, top: s.top }} />
+        <div key={s.id} className="star-dot" style={{ left: s.left, top: s.top, animationDelay: s.delay }} />
       ))}
     </>
   );
@@ -74,11 +80,19 @@ function BackgroundContent({ bgId }: { bgId: BackgroundId }) {
         <>
           <div className="shelf" />
           <div className="fridge-glow" />
-          <div className="window-stars"><StaticStars /></div>
+          <div className="window-stars">
+            <StaticStars />
+          </div>
+          <div className="store-counter" />
         </>
       );
     case 'convenience_day':
-      return <div className="shelf" />;
+      return (
+        <>
+          <div className="shelf" />
+          <div className="store-counter" />
+        </>
+      );
     case 'classroom_sunset':
       return (
         <>
@@ -126,10 +140,69 @@ function BackgroundContent({ bgId }: { bgId: BackgroundId }) {
   }
 }
 
-export function Background({ bgId }: BackgroundProps) {
+function SceneVfxLayer({ effects }: { effects: SceneVfx[] }) {
   return (
-    <div className={`bg-layer visible bg-${bgId}`}>
-      <BackgroundContent bgId={bgId} />
+    <div className="scene-vfx" aria-hidden="true">
+      {effects.includes('rain') && (
+        <>
+          <div className="vfx-rain vfx-rain-back" />
+          <div className="vfx-rain vfx-rain-front" />
+          <div className="vfx-puddles" />
+        </>
+      )}
+      {effects.includes('stars') && <div className="vfx-stardust" />}
+      {effects.includes('dust') && <div className="vfx-dust" />}
+      {effects.includes('sunset') && <div className="vfx-light-rays" />}
+      {effects.includes('machine') && (
+        <>
+          <div className="vfx-scanline" />
+          <div className="vfx-energy-grid" />
+        </>
+      )}
+      {effects.includes('station') && <div className="vfx-train-light" />}
+      {effects.includes('ocean') && <div className="vfx-ocean-glow" />}
+      {effects.includes('store') && <div className="vfx-neon-flicker" />}
+      <div className="vfx-film-grain" />
+      <div className="vfx-vignette" />
     </div>
+  );
+}
+
+function BackgroundFrame({ bgId, state }: { bgId: BackgroundId; state: 'current' | 'previous' }) {
+  const profile = SCENE_PROFILES[bgId];
+
+  return (
+    <div className={`bg-layer ${state} bg-${bgId} tone-${profile.temperature} depth-${profile.depth}`}>
+      <div className="bg-camera">
+        <BackgroundContent bgId={bgId} />
+      </div>
+      <SceneVfxLayer effects={profile.vfx} />
+      {state === 'current' && (
+        <div className="scene-caption" key={bgId}>
+          <span>{profile.title}</span>
+          <small>{profile.subtitle}</small>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function Background({ bgId }: BackgroundProps) {
+  const [previousBg, setPreviousBg] = useState<BackgroundId | null>(null);
+  const lastBg = useRef(bgId);
+
+  useEffect(() => {
+    if (lastBg.current === bgId) return;
+    setPreviousBg(lastBg.current);
+    lastBg.current = bgId;
+    const timer = window.setTimeout(() => setPreviousBg(null), 1300);
+    return () => window.clearTimeout(timer);
+  }, [bgId]);
+
+  return (
+    <>
+      {previousBg && <BackgroundFrame bgId={previousBg} state="previous" />}
+      <BackgroundFrame bgId={bgId} state="current" />
+    </>
   );
 }

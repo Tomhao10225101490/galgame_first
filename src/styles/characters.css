@@ -1,8 +1,9 @@
 .character-sprite {
   position: absolute;
   bottom: 18%;
-  transition: transform 0.4s ease, opacity 0.4s ease;
+  transition: transform 0.4s ease, opacity 0.4s ease, filter 0.4s ease;
   z-index: 10;
+  filter: saturate(1.08) contrast(1.03);
 }
 
 .character-sprite.pos-left {
@@ -27,11 +28,11 @@
 @keyframes sprite-enter {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(28px) scale(0.96);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -51,18 +52,79 @@
 }
 
 .sprite-svg {
-  width: clamp(140px, 22vw, 260px);
-  height: clamp(280px, 44vw, 480px);
-  filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3));
+  width: clamp(160px, 24vw, 292px);
+  height: clamp(320px, 48vw, 540px);
+  filter:
+    drop-shadow(0 18px 32px rgba(0, 0, 0, 0.42))
+    drop-shadow(0 0 18px rgba(240, 200, 120, 0.08));
+  animation: sprite-breathe 5.5s ease-in-out infinite alternate;
 }
 
 .sprite-expression {
   position: absolute;
-  top: 15%;
-  right: 10%;
+  top: 12%;
+  right: 6%;
   font-size: 1.2rem;
   color: var(--color-accent);
-  opacity: 0.8;
+  opacity: 0.9;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(240, 200, 120, 0.26);
+  border-radius: 999px;
+  background: rgba(8, 11, 25, 0.52);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 20px rgba(240, 200, 120, 0.12);
+}
+
+.sprite-aura {
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  width: 82%;
+  height: 70%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgba(240, 200, 120, 0.14), transparent 60%);
+  opacity: 0.7;
+  filter: blur(12px);
+  pointer-events: none;
+}
+
+.sprite-nameplate {
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  transform: translateX(-50%);
+  padding: 5px 12px;
+  min-width: 72px;
+  text-align: center;
+  color: rgba(232, 230, 227, 0.82);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  border: 1px solid rgba(240, 200, 120, 0.16);
+  border-radius: 999px;
+  background: rgba(8, 11, 25, 0.58);
+  backdrop-filter: blur(10px);
+  opacity: 0.78;
+}
+
+.expression-serious .sprite-svg {
+  filter:
+    drop-shadow(0 18px 32px rgba(0, 0, 0, 0.48))
+    drop-shadow(0 0 22px rgba(120, 180, 255, 0.12));
+}
+
+.expression-gentle .sprite-aura,
+.expression-smile .sprite-aura {
+  opacity: 1;
+  background: radial-gradient(ellipse at center, rgba(240, 200, 120, 0.2), transparent 62%);
+}
+
+@keyframes sprite-breathe {
+  from { transform: translateY(0); }
+  to { transform: translateY(-6px); }
 }
 
 @media (max-width: 768px) {

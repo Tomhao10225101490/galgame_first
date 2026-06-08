@@ -78,6 +78,51 @@ function OutfitShape({ outfit, color, accent }: { outfit: string; color: string;
   }
 }
 
+function FaceDetails({ expression }: { expression: ExpressionId }) {
+  const mouth =
+    expression === 'smile' || expression === 'gentle'
+      ? 'M84 122 Q100 134 116 122'
+      : expression === 'sad'
+        ? 'M86 128 Q100 118 114 128'
+        : expression === 'surprised'
+          ? ''
+          : expression === 'serious'
+            ? 'M88 124 L112 124'
+            : 'M90 124 Q100 128 110 124';
+  const browLeft =
+    expression === 'serious'
+      ? 'M78 96 L94 92'
+      : expression === 'sad'
+        ? 'M78 94 Q86 91 94 96'
+        : 'M78 94 Q86 91 94 94';
+  const browRight =
+    expression === 'serious'
+      ? 'M106 92 L122 96'
+      : expression === 'sad'
+        ? 'M106 96 Q114 91 122 94'
+        : 'M106 94 Q114 91 122 94';
+
+  return (
+    <>
+      <path d={browLeft} stroke="rgba(24, 18, 24, 0.42)" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+      <path d={browRight} stroke="rgba(24, 18, 24, 0.42)" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+      <ellipse cx="86" cy="106" rx={expression === 'surprised' ? 4.6 : 5.4} ry={expression === 'serious' ? 3.6 : 5.6} fill="#18151d" />
+      <ellipse cx="114" cy="106" rx={expression === 'surprised' ? 4.6 : 5.4} ry={expression === 'serious' ? 3.6 : 5.6} fill="#18151d" />
+      <circle cx="88" cy="104" r="1.6" fill="rgba(255,255,255,0.9)" />
+      <circle cx="116" cy="104" r="1.6" fill="rgba(255,255,255,0.9)" />
+      <ellipse cx="75" cy="116" rx="8" ry="3.5" fill="rgba(255, 146, 162, 0.16)" />
+      <ellipse cx="125" cy="116" rx="8" ry="3.5" fill="rgba(255, 146, 162, 0.16)" />
+      {expression === 'surprised' ? (
+        <ellipse cx="100" cy="126" rx="5" ry="7" fill="rgba(24, 18, 24, 0.38)" />
+      ) : (
+        <path d={mouth} stroke="rgba(24, 18, 24, 0.38)" strokeWidth="2" strokeLinecap="round" fill="none" />
+      )}
+      {expression === 'gentle' && <path d="M64 92 Q57 86 62 80" stroke="rgba(255,255,255,0.36)" strokeWidth="2" strokeLinecap="round" fill="none" />}
+      {expression === 'sad' && <path d="M122 112 Q126 116 123 121" stroke="rgba(120,160,255,0.45)" strokeWidth="2" strokeLinecap="round" fill="none" />}
+    </>
+  );
+}
+
 export function CharacterSprite({ characterId, expression, position, visible }: CharacterSpriteProps) {
   if (!visible) return null;
 
@@ -85,7 +130,8 @@ export function CharacterSprite({ characterId, expression, position, visible }: 
   const exprLabel = EXPRESSION_LABELS[expression];
 
   return (
-    <div className={`character-sprite pos-${position} entering`}>
+    <div className={`character-sprite pos-${position} entering expression-${expression}`}>
+      <div className="sprite-aura" />
       {exprLabel && <span className="sprite-expression">{exprLabel}</span>}
       <svg viewBox="0 0 200 300" className="sprite-svg" aria-label={char.name}>
         <defs>
@@ -93,21 +139,28 @@ export function CharacterSprite({ characterId, expression, position, visible }: 
             <stop offset="0%" stopColor={char.color} stopOpacity="0.9" />
             <stop offset="100%" stopColor={char.accentColor} stopOpacity="0.95" />
           </linearGradient>
+          <linearGradient id={`cloth-${characterId}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor={char.accentColor} stopOpacity="0.98" />
+            <stop offset="100%" stopColor={char.color} stopOpacity="0.75" />
+          </linearGradient>
+          <filter id={`soft-shadow-${characterId}`} x="-30%" y="-30%" width="160%" height="170%">
+            <feDropShadow dx="0" dy="10" stdDeviation="9" floodColor="#000000" floodOpacity="0.34" />
+          </filter>
         </defs>
         <ellipse cx="100" cy="290" rx="50" ry="8" fill="rgba(0,0,0,0.2)" />
-        <OutfitShape outfit={char.outfit} color={char.color} accent={char.accentColor} />
-        <ellipse cx="100" cy="105" rx="35" ry="40" fill={`url(#grad-${characterId})`} />
-        <HairShape style={char.hairStyle} color={char.accentColor} />
+        <g filter={`url(#soft-shadow-${characterId})`}>
+          <path d="M62 136 Q100 118 138 136 L148 284 L52 284 Z" fill={`url(#cloth-${characterId})`} opacity="0.24" />
+          <OutfitShape outfit={char.outfit} color={char.color} accent={char.accentColor} />
+          <ellipse cx="100" cy="105" rx="35" ry="40" fill={`url(#grad-${characterId})`} />
+          <path d="M75 82 Q100 68 125 82" stroke="rgba(255,255,255,0.26)" strokeWidth="5" strokeLinecap="round" fill="none" />
+          <HairShape style={char.hairStyle} color={char.accentColor} />
+        </g>
         {char.hairStyle === 'ponytail' && (
           <rect x="82" y="95" width="36" height="8" rx="3" fill="rgba(255,255,255,0.15)" />
         )}
-        {expression === 'sad' && (
-          <path d="M85 115 Q100 108 115 115" stroke="rgba(0,0,0,0.3)" strokeWidth="2" fill="none" />
-        )}
-        {expression === 'smile' && (
-          <path d="M85 118 Q100 128 115 118" stroke="rgba(0,0,0,0.3)" strokeWidth="2" fill="none" />
-        )}
+        <FaceDetails expression={expression} />
       </svg>
+      <div className="sprite-nameplate">{char.name}</div>
     </div>
   );
 }

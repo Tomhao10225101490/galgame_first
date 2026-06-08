@@ -65,6 +65,10 @@ export function GameScreen({ onReturnToTitle, initialSnapshot }: GameScreenProps
   const overlayOpen = overlay !== 'none';
 
   useEffect(() => {
+    audioEngine.playAmbience(state.background);
+  }, [state.background]);
+
+  useEffect(() => {
     if (!autoPlay || !done || overlayOpen || state.choices || !state.isWaitingForInput) return;
     const timer = window.setTimeout(() => advance(), settings.autoDelay);
     return () => clearTimeout(timer);
@@ -72,9 +76,13 @@ export function GameScreen({ onReturnToTitle, initialSnapshot }: GameScreenProps
 
   const handleAdvance = useCallback(() => {
     audioEngine.ensureStarted();
-    audioEngine.playSe('click');
-    if (done) advance();
-    else skip();
+    if (done) {
+      audioEngine.playSe('pageTurn');
+      advance();
+    } else {
+      audioEngine.playSe('click');
+      skip();
+    }
   }, [done, advance, skip]);
 
   const handleChoice = useCallback(
@@ -106,7 +114,7 @@ export function GameScreen({ onReturnToTitle, initialSnapshot }: GameScreenProps
   };
 
   return (
-    <div className="game-screen" onClick={() => audioEngine.ensureStarted()}>
+    <div className={`game-screen scene-${state.background} bgm-${state.bgm}`} onClick={() => audioEngine.ensureStarted()}>
       <Background bgId={state.background} />
 
       {settings.showSprites &&
