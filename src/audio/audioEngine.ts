@@ -8,13 +8,11 @@ class AudioEngine {
   private volume = 0.5;
   private muted = false;
   private seCache = new Map<SeId, Howl>();
-  private unlocked = false;
 
   ensureStarted(): void {
     if (Howler.ctx?.state === 'suspended') {
       void Howler.ctx.resume();
     }
-    this.unlocked = true;
   }
 
   setVolume(v: number): void {
