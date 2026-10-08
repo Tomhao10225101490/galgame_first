@@ -11,7 +11,6 @@ class AudioEngine {
   private unlocked = false;
 
   ensureStarted(): void {
-    if (this.unlocked) return;
     if (Howler.ctx?.state === 'suspended') {
       void Howler.ctx.resume();
     }
@@ -86,7 +85,9 @@ class AudioEngine {
         if (this.currentBgm === id) this.currentBgm = null;
       },
       onplayerror: () => {
-        next.once('unlock', () => next.play());
+        next.once('unlock', () => {
+          if (this.currentBgm === id && this.bgmHowl === next) next.play();
+        });
       },
     });
 

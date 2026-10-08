@@ -20,6 +20,11 @@ export function MainMenu({
   onSettings,
   onCredits,
 }: MainMenuProps) {
+  const unlockAndPlayTitle = () => {
+    audioEngine.ensureStarted();
+    audioEngine.playBgm('night');
+  };
+
   return (
     <div className="main-menu">
       <div
@@ -34,7 +39,7 @@ export function MainMenu({
           <button
             className="menu-btn"
             onClick={() => {
-              audioEngine.ensureStarted();
+              unlockAndPlayTitle();
               onStart();
             }}
           >
@@ -44,7 +49,7 @@ export function MainMenu({
             <button
               className="menu-btn"
               onClick={() => {
-                audioEngine.ensureStarted();
+                unlockAndPlayTitle();
                 onContinue();
               }}
             >
@@ -54,22 +59,23 @@ export function MainMenu({
           <button
             className="menu-btn"
             onClick={() => {
-              audioEngine.ensureStarted();
+              unlockAndPlayTitle();
               onLoad();
             }}
           >
             读取存档
           </button>
-          <button className="menu-btn" onClick={onEndings}>
+          <button className="menu-btn" onClick={() => { unlockAndPlayTitle(); onEndings(); }}>
             结局收集
           </button>
-          <button className="menu-btn menu-btn-dim" onClick={onSettings}>
+          <button className="menu-btn menu-btn-dim" onClick={() => { unlockAndPlayTitle(); onSettings(); }}>
             设置
           </button>
-          <button className="menu-btn menu-btn-dim" onClick={onCredits}>
+          <button className="menu-btn menu-btn-dim" onClick={() => { unlockAndPlayTitle(); onCredits(); }}>
             素材鸣谢
           </button>
         </nav>
+        <p className="menu-audio-hint">点击任意按钮会开启真实 BGM，建议检查系统音量并关闭浏览器静音。</p>
       </div>
     </div>
   );

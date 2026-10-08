@@ -14,13 +14,21 @@ function loadImage(url: string): Promise<void> {
 }
 
 function loadAudio(url: string): Promise<void> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const audio = new Audio();
-    audio.oncanplaythrough = () => resolve();
-    audio.onerror = () => reject(new Error(`Failed to load audio: ${url}`));
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      resolve();
+    };
+    audio.onloadedmetadata = finish;
+    audio.oncanplay = finish;
+    audio.onerror = finish;
     audio.preload = 'auto';
     audio.src = url;
     audio.load();
+    window.setTimeout(finish, 3500);
   });
 }
 
