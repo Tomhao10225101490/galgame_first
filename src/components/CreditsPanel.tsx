@@ -14,7 +14,7 @@ export function CreditsPanel({ onClose }: CreditsPanelProps) {
           </section>
           <section>
             <h3>音乐与音效</h3>
-            <p>BGM 与 SE 为项目内置 ffmpeg 合成氛围音轨，可自由用于本游戏演示与修改。</p>
+            <p>BGM / SE 来自 OpenGameArt.org 等免版税素材（详见 docs/ASSETS_LICENSE.md）。悬疑段落配乐请注明 pixelsphere.org。</p>
           </section>
           <section>
             <h3>引擎与技术</h3>

@@ -10,6 +10,7 @@ import type { AppScreen, GameSettings, GameSnapshot, SaveSlot } from './engine/t
 import { CRITICAL_PRELOAD_URLS, getAllBgmUrls } from './data/assets';
 import { loadContinue, loadSaves, loadSettings, saveSettings, loadUnlockedEndings } from './utils/storage';
 import { preloadUrls } from './utils/assetPreloader';
+import { audioEngine } from './audio/audioEngine';
 
 export default function App() {
   const [screen, setScreen] = useState<AppScreen>('mainMenu');
@@ -26,6 +27,21 @@ export default function App() {
       () => setBootLoading(false),
     );
   }, []);
+  useEffect(() => {
+    audioEngine.setVolume(settings.volume);
+    audioEngine.setMuted(settings.muted);
+  }, [settings.volume, settings.muted]);
+
+  useEffect(() => {
+    if (screen !== 'mainMenu') return;
+    const startMenuBgm = () => {
+      audioEngine.ensureStarted();
+      audioEngine.playBgm('night');
+    };
+    window.addEventListener('pointerdown', startMenuBgm, { once: true });
+    return () => window.removeEventListener('pointerdown', startMenuBgm);
+  }, [screen]);
+
 
   const updateSettings = (partial: Partial<GameSettings>) => {
     setSettings((prev) => {

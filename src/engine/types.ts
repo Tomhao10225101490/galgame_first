@@ -169,7 +169,7 @@ export const DEFAULT_VARIABLES: GameVariables = {
 export const DEFAULT_SETTINGS: GameSettings = {
   textSpeed: 40,
   autoDelay: 2500,
-  volume: 0.5,
+  volume: 0.7,
   muted: false,
   showSprites: true,
 };

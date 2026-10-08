@@ -78,9 +78,13 @@ export function GameScreen({ onReturnToTitle, initialSnapshot }: GameScreenProps
 
   const handleAdvance = useCallback(() => {
     audioEngine.ensureStarted();
-    audioEngine.playSe('click');
-    if (done) advance();
-    else skip();
+    if (done) {
+      audioEngine.playSe('pageTurn');
+      advance();
+    } else {
+      audioEngine.playSe('click');
+      skip();
+    }
   }, [done, advance, skip]);
 
   const handleChoice = useCallback(

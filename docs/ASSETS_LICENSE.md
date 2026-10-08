@@ -16,10 +16,19 @@
 
 ## 音乐与音效
 
-| 类型 | 来源 | 授权 |
-|------|------|------|
-| BGM（night/day/rain/stars/tension/ending） | `scripts/generate-audio.sh` ffmpeg 合成 | 项目原创，可自由使用 |
-| SE（click/choice/save/pageTurn） | 同上 | 同上 |
+| 游戏内 ID | 文件 | 气质 / 用途 | 来源（OpenGameArt.org） | 授权 |
+|-----------|------|-------------|-------------------------|------|
+| night | `bgm/night.mp3` | 夜班便利店、安静夜晚 | evening.mp3 | 以 OGA 页面标注为准 |
+| day | `bgm/day.mp3` | 校园日常、轻快 | TownTheme.mp3 | 以 OGA 页面标注为准 |
+| rain | `bgm/rain.mp3` | 雨夜、回忆 | Rain.mp3 | 以 OGA 页面标注为准 |
+| stars | `bgm/stars.mp3` | 观星、天文馆 | spacetheme.mp3（Space Theme） | 以 OGA 页面标注为准 |
+| tension | `bgm/tension.mp3` | 悬疑、分歧 | song21.mp3（Mysterious Ambience） | CC-BY，鸣谢 **pixelsphere.org** |
+| ending | `bgm/ending.mp3` | 结局、车站告别 | the_field_of_dreams.mp3 | 以 OGA 页面标注为准 |
+| SE | `se/*.mp3` | 点击 / 选项 / 存档 / 翻页 | click.mp3、select.ogg、save.mp3、click.wav | 以 OGA 页面标注为准 |
+
+下载与重采样：`npm run download-audio`（`scripts/download-story-audio.sh`）。
+
+旧版 `scripts/generate-audio.sh` 为 ffmpeg 合成垫乐，仅作离线后备，正式构建请使用上述真实配乐。
 
 ## UI
 
